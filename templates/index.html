@@ -18,11 +18,19 @@
     </tr>
     </thead>
     <tbody>
+    {% for item in results %}
     <tr>
-        <td>Godzilla</td>
-        <td>2</td>
-        <td>$299.99</td>
+        <td>{{ item['name'] }}</td>
+        <td>{{ item['status'] }}</td>
+        <td>{{ item['number'] }}</td>
+
+        {% if item['task_exists'] is true %}
+        <td><button>Edit</button></td>
+        {% else %}
+        <td><button>Create</button></td>
+        {% endif %}
     </tr>
+    {% endfor %}
     </tbody>
 </table>
 
