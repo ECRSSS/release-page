@@ -27,5 +27,6 @@ docker-compose up -d
 And run server in hot-reload mode
 
 ```shell
+export PYTHONPATH=$(pwd)/src
 python3 -m uvicorn main:app --reload
 ```
