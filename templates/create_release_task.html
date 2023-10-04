@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="../static/light.min.css">
+</head>
+<body>
+<h1>DBO-SME Release page</h1>
+<h2>Релизная задача: {{ release_task.name }}</h2>
+<h2>Fix Version</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Имя</th>
+        <th>Команды</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>{{ version.name }}</td>
+        <td>{{ version.teams_string }}</td>
+    </tr>
+    </tbody>
+</table>
+<h2>Services</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Имя сервиса</th>
+        <th>Версия</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for service in services %}
+    <tr>
+        <td>{{ service.get_name() }}</td>
+        <td>{{ service.version }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<h3>Добавить сервис</h3>
+<form>
+    <table>
+        <thead>
+        <tr>
+            <th>Имя сервиса</th>
+            <th>Версия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+
+            <td>
+                <select name="service_name">
+                    <option>entity-example-1</option>
+                    <option>entity-example-2</option>
+                </select>
+            </td>
+            <td>
+                <input name="service_version" type="text"/>
+            </td>
+            <td>
+                <input type="submit" value="Добавить сервис к релизной задаче"/>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+    <input type="hidden" name="action" value="add_service">
+</form>
+</body>
+</html>

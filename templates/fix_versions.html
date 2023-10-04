@@ -26,10 +26,10 @@
 
         {% if version.is_rt_exists is true %}
         <td><a href="https://jira.server.ru/browse/{{ version.release_task.key }}">{{ version.release_task.key }}</a></td>
-        <td><button>Редактировать</button></td>
+        <td><a href="{{ backend_host }}/edit_task/{{ version.id }}">Редактировать</a></td>
         {% else %}
         <td>Отсутствует</td>
-        <td><button>Создать</button></td>
+        <td><a href="{{ backend_host }}/create_task/{{ version.id }}">Создать</a></td>
         {% endif %}
     </tr>
     {% endfor %}

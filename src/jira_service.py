@@ -2,11 +2,11 @@ from jira import JIRA
 import pickle
 import codecs
 import datetime
-
+from config import JIRA_USER, JIRA_TOKEN, JIRA_URL
 
 class FixVersionModel:
     def __init__(self, jira_project_version, version_issues):
-        self.url = f'https://jira.server.ru/projects/SMDEV/versions/{int(jira_project_version.id)}'
+        self.url = f'{JIRA_URL}/projects/SMDEV/versions/{int(jira_project_version.id)}'
         self.id = jira_project_version.id
         self.issues = version_issues
         self.name = jira_project_version.raw['name']
@@ -39,10 +39,9 @@ class FixVersionModel:
 class JiraService:
 
     def __init__(self):
-        self.jira_url = 'https://jira.server.ru'
-        self.username = '*'
-        self.token = '*'
-
+        self.jira_url = JIRA_URL
+        self.username = JIRA_USER
+        self.token = JIRA_TOKEN
         self.jira = JIRA(server=self.jira_url, basic_auth=(self.username, self.token))
         self.project_key = 'SMDEV'
 

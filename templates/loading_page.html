@@ -6,6 +6,28 @@
     <title>DBO-SME Releases - Wait</title>
     <link rel="stylesheet" href="../static/light.min.css">
     <link rel="stylesheet" href="../static/loading.css">
+    <script src="../static/jquery.min.js" type="text/javascript"></script>
+    <script>
+        $(document).ready(function() {
+  $.ajax({
+    type: "GET",
+    url: "{{ backend_host }}/refresh_versions",
+    success: function(data, textStatus) {
+        console.log(data)
+        console.log(textStatus)
+        if (data.redirect) {
+            window.location.href = data.redirect;
+        } else {
+            console.log('error when getting redirect')
+        }
+    },
+    "headers": {
+              "accept": "application/json",
+              "Access-Control-Allow-Origin":"localhost"
+          }
+   });
+});
+    </script>
 </head>
 <body>
 <h1>DBO-SME Release page</h1>
