@@ -11,6 +11,7 @@ from src.mongo_service import MongoService
 from src.release_task import ReleaseTaskModel
 from src.utils import is_versions_cache_time_expired, str_is_not_empty_or_none
 from src.config import BACKEND_HOST
+from src.gitlab_service import GitlabService
 
 app = FastAPI()
 
@@ -28,6 +29,7 @@ app.add_middleware(
 
 jira_service = JiraService()
 mongo_service = MongoService()
+gitlab_service = GitlabService()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -66,16 +68,20 @@ async def clear_cache_versions(request: Request):
 
 
 @app.get("/debug_delete_tasks", response_class=JSONResponse)
-async def clear_cache_versions(request: Request):
+async def debug_delete_tasks(request: Request):
     mongo_service.clear_tasks()
     return JSONResponse(content={'STATUS': 'OK'}, headers={'Access-Control-Allow-Origin': '*'})
 
 
 @app.get("/create_task/{version_id}")
-async def create_release_task(request: Request, version_id: str,
-                              action: Union[str, None] = None,
-                              service_name: Union[str, None] = None,
-                              service_version: Union[str, None] = None):
+async def create_release_task(
+        request: Request, version_id: str,
+        action: Union[str, None] = None,
+        service_name: Union[str, None] = None,
+        service_version: Union[str, None] = None,
+        consul_url: Union[str, None] = None,
+        sql_url: Union[str, None] = None
+):
     print(f'service {service_name}, version: {service_version}, action: {action}')
     target_fix_version = mongo_service.read_fix_version_by_version_id(version_id)
     if target_fix_version.is_rt_exists is True:
@@ -94,7 +100,9 @@ async def create_release_task(request: Request, version_id: str,
                 release_task.add_service(service_name, service_version)
                 mongo_service.update_release_task(release_task)
             return RedirectResponse(f"/create_task/{version_id}")
-
+        elif action is not None and action == 'set_configs_url':
+            # TODO: ОПИСАТЬ ПОВЕДЕНИЕ ПРИ УСТАНОВКЕ ПОЛЯ С КОНФИГАМИ
+            pass
 
         return templates.TemplateResponse("create_release_task.html",
                                           {'request': request,
@@ -113,3 +121,8 @@ async def create_release_task(request: Request, version_id):
     else:
         return templates.TemplateResponse("create_release_task.html",
                                           {'request': request, 'version': target_fix_version})
+
+
+if __name__ == '__main__':
+    gitlab_service.__gitlab_service()
+    pass

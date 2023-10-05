@@ -71,5 +71,19 @@
     </table>
     <input type="hidden" name="action" value="add_service">
 </form>
+
+<h3>Ссылка на ветку с конфигурациями</h3>
+<form>
+    <input name="consul_url" type="url" style="width: 600px">
+    <input type="hidden" name="action" value="set_configs_url">
+    <input type="submit" value="Подтвердить">
+</form>
+
+<h3>Ссылка на ветку с SQL скриптами</h3>
+<form>
+    <input name="sql_url" type="text" style="width: 600px"/>
+    <input type="hidden" name="action" value="set_sql_url">
+    <input type="submit" value="Подтвердить">
+</form>
 </body>
 </html>

@@ -39,10 +39,3 @@ class ReleaseTaskModel:
         # for decode -> pickle.loads(codecs.decode(pickled.encode(), "base64"))
         return codecs.encode(pickle.dumps(self), "base64").decode()
 
-
-if __name__ == '__main__':
-    d = dict()
-    d['service'] = {'field-1': 1, 'field-2': 'two'}
-    for k, v in d.items():
-        pass
-    pass
