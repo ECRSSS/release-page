@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from src.jira_service import JiraService, FixVersionModel
 from src.mongo_service import MongoService
-from src.release_task import ReleaseTaskModel
+from src.release_task import ReleaseTaskModel, ConfigsMergeRequest
 from src.utils import is_versions_cache_time_expired, str_is_not_empty_or_none
 from src.config import BACKEND_HOST
 from src.gitlab_service import GitlabService
@@ -16,7 +16,7 @@ from src.gitlab_service import GitlabService
 app = FastAPI()
 
 origins = [
-    "http://localhost",
+    "http://127.0.0.1",
 ]
 
 app.add_middleware(
@@ -79,11 +79,18 @@ async def create_release_task(
         action: Union[str, None] = None,
         service_name: Union[str, None] = None,
         service_version: Union[str, None] = None,
-        consul_url: Union[str, None] = None,
+        configs_mr_name: Union[str, None] = None,
         sql_url: Union[str, None] = None
 ):
     print(f'service {service_name}, version: {service_version}, action: {action}')
     target_fix_version = mongo_service.read_fix_version_by_version_id(version_id)
+
+    # список веток открытых МRов
+    opened_configs_merge_requests = gitlab_service.configs_repository.get_mr_list()
+    merge_requests_source_branches = [mr.attributes['source_branch'] for mr in opened_configs_merge_requests
+                                      if mr.attributes['target_branch'] == 'master']
+    merge_requests_source_branches.insert(0, '-')
+
     if target_fix_version.is_rt_exists is True:
         return templates.TemplateResponse("task_already_exists.html",
                                           {'request': request, 'version': target_fix_version})
@@ -100,15 +107,21 @@ async def create_release_task(
                 release_task.add_service(service_name, service_version)
                 mongo_service.update_release_task(release_task)
             return RedirectResponse(f"/create_task/{version_id}")
-        elif action is not None and action == 'set_configs_url':
-            # TODO: ОПИСАТЬ ПОВЕДЕНИЕ ПРИ УСТАНОВКЕ ПОЛЯ С КОНФИГАМИ
-            pass
+
+        elif action is not None and action == 'set_configs':
+            config_mrs = gitlab_service.configs_repository.get_mr_list()
+            config_mr = [mr for mr in config_mrs if mr.attributes['source_branch']
+                         == configs_mr_name and mr.attributes['target_branch'] == 'master'][0]
+            release_task.set_configs_mr(config_mr)
+            mongo_service.update_release_task(release_task)
+            return RedirectResponse(f"/create_task/{version_id}")
 
         return templates.TemplateResponse("create_release_task.html",
                                           {'request': request,
                                            'version': target_fix_version,
                                            'release_task': release_task,
-                                           'services': release_task.services
+                                           'services': release_task.services,
+                                           'opened_config_repo_mrs': merge_requests_source_branches
                                            })
 
 

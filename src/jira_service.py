@@ -4,6 +4,7 @@ import codecs
 import datetime
 from config import JIRA_USER, JIRA_TOKEN, JIRA_URL
 
+
 class FixVersionModel:
     def __init__(self, jira_project_version, version_issues):
         self.url = f'{JIRA_URL}/projects/SMDEV/versions/{int(jira_project_version.id)}'
@@ -56,5 +57,3 @@ class JiraService:
 
     def get_all_issues_with_version(self, version):
         return self.jira.search_issues(jql_str=f'fixVersion = "{version.name}"')
-
-

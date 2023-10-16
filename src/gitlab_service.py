@@ -1,5 +1,4 @@
 import gitlab
-from gitlab.v4.objects.projects import Project
 from config import GITLAB_URL, GITLAB_TOKEN
 from config import GITLAB_CONSUL_PROJECT_ID, GITLAB_SQL_PROJECT_ID
 
@@ -39,4 +38,5 @@ class GitlabService:
 
 if __name__ == '__main__':
     mrs = GitlabService().configs_repository.get_mr_list()
+    changes = mrs[0].changes()['changes']
     pass

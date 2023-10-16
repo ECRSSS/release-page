@@ -14,7 +14,7 @@ class MongoService:
     RELEASE_TASKS_COLLECTION = 'release_tasks'
 
     def __init__(self):
-        self.client = MongoClient('mongodb://root:example@localhost:27017/')
+        self.client = MongoClient('mongodb://root:example@127.0.0.1:27017/')
 
     def save_fix_versions(self, versions: list[FixVersionModel]):
         fv_collection = self.client[MONGO_DB_NAME][self.FIX_VERSIONS_COLLECTION]
@@ -67,3 +67,8 @@ class MongoService:
 
     def clear_tasks(self):  # clear fix versions in mongo and return num of deleted rows
         return self.client[MONGO_DB_NAME][self.RELEASE_TASKS_COLLECTION].delete_many({}).deleted_count
+
+
+if __name__ == '__main__':
+    # MongoService().clear_tasks()
+    pass

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hello Bulma!</title>
     <link rel="stylesheet" href="../static/light.min.css">
+    <script src="../static/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
 <h1>DBO-SME Release page</h1>
@@ -30,6 +31,7 @@
     <tr>
         <th>Имя сервиса</th>
         <th>Версия</th>
+        <th>Изменение конфигурации</th>
     </tr>
     </thead>
     <tbody>
@@ -37,6 +39,7 @@
     <tr>
         <td>{{ service.get_name() }}</td>
         <td>{{ service.version }}</td>
+        <td>{{ service.get_configuration_change_view() }}</td>
     </tr>
     {% endfor %}
     </tbody>
@@ -54,10 +57,11 @@
         <tr>
 
             <td>
-                <select name="service_name">
-                    <option>entity-example-1</option>
-                    <option>entity-example-2</option>
-                </select>
+                <input name="service_name" list="brow" type="search" autocomplete="off">
+                <datalist id="brow">
+                    <option value="entity-application">
+                    <option value="entity-dbo">
+                </datalist>
             </td>
             <td>
                 <input name="service_version" type="text"/>
@@ -71,11 +75,26 @@
     </table>
     <input type="hidden" name="action" value="add_service">
 </form>
-
-<h3>Ссылка на ветку с конфигурациями</h3>
+<h3>Текущий merge request с обновлениями конфигураций</h3>
+{% if release_task.configs_mr is none %}
+<input type="text" disabled value="Not setted"/>
+{% else %}
+<input type="text" disabled value="{{ release_task.configs_mr.get_source_branch() }}"/>
+<h3>Для следующих сервисов изменятся конфигурации:</h3>
+<ul>
+    {% for service in release_task.configs_mr.get_services_with_changes_prod() %}
+    <li>{{ service }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<h3>Выберите merge request с обновлениями из репозитория с конфигурациями для данной fix version</h3>
 <form>
-    <input name="consul_url" type="url" style="width: 600px">
-    <input type="hidden" name="action" value="set_configs_url">
+    <select name="configs_mr_name">
+        {% for mr_source_branch in opened_config_repo_mrs %}
+        <option>{{ mr_source_branch }}</option>
+        {% endfor %}
+    </select>
+    <input type="hidden" name="action" value="set_configs">
     <input type="submit" value="Подтвердить">
 </form>
 
