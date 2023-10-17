@@ -1,6 +1,5 @@
 import codecs
 import pickle
-from ctypes import Union
 
 from gitlab.v4.objects import ProjectMergeRequest
 
@@ -72,7 +71,7 @@ class ReleaseTaskModel:
         for service in self.services:
             if list_services_with_config_updates is None:
                 service.set_is_config_changes(None)
-            elif service in list_services_with_config_updates:
+            elif service.get_name() in list_services_with_config_updates:
                 service.set_is_config_changes(True)
             else:
                 service.set_is_config_changes(False)
@@ -88,6 +87,7 @@ class ReleaseTaskModel:
         if validate_service_version(service_version) is not None:
             print(service_name)
             self.services.append(Service(service_name, service_version))
+        self.__updates_service_changes()
 
     def pickle(self):  # -> returns serialized object
         # for decode -> pickle.loads(codecs.decode(pickled.encode(), "base64"))
